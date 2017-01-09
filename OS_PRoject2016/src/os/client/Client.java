@@ -8,11 +8,11 @@ public class Client{
 	private Socket requestSocket;
 	private ObjectOutputStream out;
  	private ObjectInputStream in;
- 	private String message="";
+ 	private String message;
  	private int userChoice = 0;
- 	private String response = "";
+ 	private String response;
  	private String ipaddress;
- 	private Scanner stdin;
+ 	private Scanner scan;
  	private MenuUI menu;
  	
 	Client(){
@@ -21,11 +21,12 @@ public class Client{
 	
 	public void run()
 	{
-		stdin = new Scanner(System.in);
+		scan = new Scanner(System.in);
 		try{
 			//1. creating a socket to connect to the server
 			System.out.println("Please Enter IP Address of server to connect");
-			ipaddress = stdin.next();
+			ipaddress = scan.next();
+			scan.nextLine();//flush the scanner
 			requestSocket = new Socket(ipaddress, 2004);
 			System.out.println("Connected to "+ipaddress+" in port 2004");
 			//2. get Input and Output streams
@@ -38,30 +39,32 @@ public class Client{
 				try
 				{
 						menu.startMenu(); // show menu options for a start
-						response = (String)in.readObject();//read in server response
+						response = (String)in.readObject();//receive response from server
+						System.out.println(response);// print out response so client knows what is being asked 
 						
 						//read in user choice. I'm using do/while loop to make sure only allowed options can go through
 						do{
-							userChoice = stdin.nextInt();//read in user choice
+							userChoice = scan.nextInt();//read in user choice
+							
 						}while(userChoice < 0 || userChoice > 3);
+						
+						scan.nextLine();//flush the scanner
 						
 						switch(userChoice){
 						case 1:
-							message = "register";
+							registerClient();
 							break;
-						case 2:
-							message = "login";
+						case 2:							
+							loginClient();							
 							break;
 						case 3:
-							message = "bye";
+							exitApplication();
+							
 							break;
 							
 						}
 						
-						sendMessage(message);//send user's chosen option to server
-						
-						response = (String)in.readObject();
-						
+						response = (String)in.readObject();						
 				}
 				catch(ClassNotFoundException classNot)
 				{
@@ -92,11 +95,47 @@ public class Client{
 		try{
 			out.writeObject(msg);
 			out.flush();
-			System.out.println("client>" + msg);
+			System.out.println("client side entry>" + msg);
 		}
 		catch(IOException ioException){
 			ioException.printStackTrace();
 		}
 	}
 	
+	//registration handling method
+	private void registerClient(){
+		message = "register";
+		sendMessage(message);//send user's chosen option to server
+		
+		
+		try {
+			//response = (String)in.readObject();//receive response from server
+			for(int i = 0; i < 5; i++){
+				response = (String)in.readObject();//receive response from server asking for client details
+				System.out.println(response);// print out response so client knows what is being asked 
+				message = scan.nextLine();//read in client choice			
+				sendMessage(message);
+			}
+			
+			response = (String)in.readObject();
+			
+			System.out.println(response);
+			
+		} catch (ClassNotFoundException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	//login handling method
+	private void loginClient(){
+		message = "login";
+		sendMessage(message);//send user's chosen option to server
+	}
+	
+	//method to exit application
+	private void exitApplication(){
+		message = "bye";
+		sendMessage(message);//send user's chosen option to server
+	}
 }

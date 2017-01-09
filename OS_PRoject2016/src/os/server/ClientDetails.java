@@ -4,7 +4,7 @@ public class ClientDetails {
 	//variables to hold client details
 	private String name;
 	private String Address;
-	private int accNumber;
+	private String accNumber;
 	private String username;
 	private String password;
 	
@@ -29,11 +29,11 @@ public class ClientDetails {
 		Address = address;
 	}
 
-	public int getAccNumber() {
+	public String getAccNumber() {
 		return accNumber;
 	}
 
-	public void setAccNumber(int accNumber) {
+	public void setAccNumber(String accNumber) {
 		this.accNumber = accNumber;
 	}
 
@@ -51,6 +51,12 @@ public class ClientDetails {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	@Override
+	public String toString() {
+		return "ClientDetails [name=" + name + ", Address=" + Address + ", accNumber=" + accNumber + ", username="
+				+ username + ", password=" + password + "]";
 	}
 
 }

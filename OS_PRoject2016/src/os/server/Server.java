@@ -1,12 +1,8 @@
 package os.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -24,12 +20,13 @@ public class Server {
 
 //inner class looking after client requests
 class ClientServiceThread extends Thread {
-  Socket clientSocket;
-  String message;
-  int clientID = 0;
-  volatile boolean running = true;
-  ObjectOutputStream out;
-  ObjectInputStream in;
+  private Socket clientSocket;
+  private String message;
+  private String request;
+  private int clientID = 0;
+  private volatile boolean keepRunning = true;
+  private ObjectOutputStream out;
+  private ObjectInputStream in;
 
   ClientServiceThread(Socket s, int i) {
     clientSocket = s;
@@ -37,11 +34,10 @@ class ClientServiceThread extends Thread {
   }
 
  
-  public void run() {
-    System.out.println("Accepted Client : ID - " + clientID + " : Address - "
-        + clientSocket.getInetAddress().getHostName());
+  public void run() {	  
     try 
     {
+    	System.out.println("Connection successful!");
     	out = new ObjectOutputStream(clientSocket.getOutputStream());
 		out.flush();
 		in = new ObjectInputStream(clientSocket.getInputStream());
@@ -52,36 +48,78 @@ class ClientServiceThread extends Thread {
 		do{
 			try
 			{
+				message = "Make a choice please";
 				
-				System.out.println("client>"+clientID+"  "+ message);
-				//if (message.equals("bye"))
-				sendMessage("server got the following: "+message);
-				message = (String)in.readObject();
+				
+				sendMessage(message);
+				
+				request = (String)in.readObject();
+				
+				//depending on user request message is adapted
+				switch(request){
+				case "register":
+					message = "registration requested";	
+					registerClient();
+					break;
+				case "login":
+					message = "login requested";
+					loginClient();
+					break;
+				case "bye":
+					message = "disconnect";
+					break;
+				}
+				
+				sendMessage(message);
 			}
 			catch(ClassNotFoundException classnot){
 				System.err.println("Data received in unknown format");
 			}
 			
-    	}while(!message.equals("bye"));
+    	}while(!message.equals("disconnect"));
       
 		System.out.println("Ending Client : ID - " + clientID + " : Address - "
 		        + clientSocket.getInetAddress().getHostName());
     } catch (Exception e) {
       e.printStackTrace();
     }
+    //close socket and data streams at the end.
+    finally{
+    	try {
+			in.close();
+			out.close();
+			clientSocket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
   }
   
   //method to send message string
-  void sendMessage(String msg)
+  private void sendMessage(String msg)
  	{
  		try{
  			out.writeObject(msg);
- 			out.flush();
- 			System.out.println("client> " + msg);
+ 			out.flush(); 	
+ 			System.out.println("client "+clientID+": "+ msg);
  		}
  		catch(IOException ioException){
  			ioException.printStackTrace();
  		}
  	}
+  
+  
+  //method to register new client
+  private void registerClient(){
+	  
+  }
+  
+  //method to login existing client
+  private void loginClient(){
+	  
+  }
+  
+ 
 }
 

@@ -5,20 +5,26 @@ import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 public class Client{
-	Socket requestSocket;
-	ObjectOutputStream out;
- 	ObjectInputStream in;
- 	String message="";
- 	String ipaddress;
- 	Scanner stdin;
+	private Socket requestSocket;
+	private ObjectOutputStream out;
+ 	private ObjectInputStream in;
+ 	private String message="";
+ 	private int userChoice = 0;
+ 	private String response = "";
+ 	private String ipaddress;
+ 	private Scanner stdin;
+ 	private MenuUI menu;
  	
-	Client(){}
-	void run()
+	Client(){
+		menu = new MenuUI();
+	}
+	
+	public void run()
 	{
 		stdin = new Scanner(System.in);
 		try{
 			//1. creating a socket to connect to the server
-			System.out.println("Please Enter your IP Address");
+			System.out.println("Please Enter IP Address of server to connect");
 			ipaddress = stdin.next();
 			requestSocket = new Socket(ipaddress, 2004);
 			System.out.println("Connected to "+ipaddress+" in port 2004");
@@ -26,18 +32,35 @@ public class Client{
 			out = new ObjectOutputStream(requestSocket.getOutputStream());
 			out.flush();
 			in = new ObjectInputStream(requestSocket.getInputStream());
-			System.out.println("Hello");
+			
 			//3: Communicating with the server
 			do{
 				try
 				{
+						menu.startMenu(); // show menu options for a start
+						response = (String)in.readObject();//read in server response
 						
-						message = (String)in.readObject();
-						System.out.println("Please Enter the Message to send...");
-						message = stdin.nextLine();
-						sendMessage(message);
+						//read in user choice. I'm using do/while loop to make sure only allowed options can go through
+						do{
+							userChoice = stdin.nextInt();//read in user choice
+						}while(userChoice < 0 || userChoice > 3);
 						
+						switch(userChoice){
+						case 1:
+							message = "register";
+							break;
+						case 2:
+							message = "login";
+							break;
+						case 3:
+							message = "bye";
+							break;
+							
+						}
 						
+						sendMessage(message);//send user's chosen option to server
+						
+						response = (String)in.readObject();
 						
 				}
 				catch(ClassNotFoundException classNot)

@@ -131,8 +131,26 @@ public class Client{
 	
 	//login handling method
 	private void loginClient(){
+		String userName;
+		String password;
+		
 		message = "login";
 		sendMessage(message);//send user's chosen option to server
+		
+		try {
+			response = (String)in.readObject();
+			userName = scan.nextLine();
+			sendMessage(userName);
+			
+			response = (String)in.readObject();
+			password = scan.nextLine();
+			sendMessage(password);
+			
+		} catch (ClassNotFoundException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	//method to exit application

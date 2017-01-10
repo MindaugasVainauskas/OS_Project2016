@@ -25,6 +25,7 @@ class ClientServiceThread extends Thread {
   private String request;
   private int clientID;
   private volatile boolean keepRunning = true;
+  private boolean authenticated = false;
   private ObjectOutputStream out;
   private ObjectInputStream in;
   
@@ -68,6 +69,9 @@ class ClientServiceThread extends Thread {
 					break;
 				case "login":					
 					loginClient();
+					if(authenticated){
+						accessAccount();
+					}
 					break;
 				case "bye":
 					disconnectClient();
@@ -100,7 +104,14 @@ class ClientServiceThread extends Thread {
     }
   }
   
-  //method to send message string
+  private void accessAccount() {
+	message = "Authentication successful";
+	sendMessage(message);
+	
+}
+
+
+//method to send message string
   private void sendMessage(String msg)
  	{
  		try{
@@ -168,9 +179,28 @@ class ClientServiceThread extends Thread {
   }
   
   //method to login existing client
-  private void loginClient(){
-	  message = "login requested";
-	  sendMessage(message);
+  private boolean loginClient(){
+	  String uNameCheck;
+	  String passCheck;
+	  
+	  
+	  try {
+		  message = "Please enter your username";
+		  sendMessage(message);
+		  uNameCheck = (String)in.readObject();
+		  
+		  message = "Please enter your password";
+		  sendMessage(message);
+		  passCheck = (String)in.readObject();
+	} catch (ClassNotFoundException | IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	  
+	  //now need file reader to read from client file. Find the details that match. if no details found then no authentication is provided.
+	  
+	  return authenticated;
+	  
   }
   
   //method to disconnect client

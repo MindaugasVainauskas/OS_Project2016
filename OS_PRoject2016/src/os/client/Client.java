@@ -8,8 +8,8 @@ public class Client{
 	private Socket requestSocket;
 	private ObjectOutputStream out;
  	private ObjectInputStream in;
- 	private String message;
- 	private int userChoice = 0;
+ 	private String message="";
+ 	private int userChoice;
  	private String response;
  	private String ipaddress;
  	private Scanner scan;
@@ -26,7 +26,7 @@ public class Client{
 			//1. creating a socket to connect to the server
 			System.out.println("Please Enter IP Address of server to connect");
 			ipaddress = scan.next();
-			scan.nextLine();//flush the scanner
+			
 			requestSocket = new Socket(ipaddress, 2004);
 			System.out.println("Connected to "+ipaddress+" in port 2004");
 			//2. get Input and Output streams
@@ -36,35 +36,37 @@ public class Client{
 			
 			//3: Communicating with the server
 			do{
+				
 				try
 				{
-						menu.startMenu(); // show menu options for a start
-						response = (String)in.readObject();//receive response from server
-						System.out.println(response);// print out response so client knows what is being asked 
-						
-						//read in user choice. I'm using do/while loop to make sure only allowed options can go through
-						do{
-							userChoice = scan.nextInt();//read in user choice
-							
-						}while(userChoice < 0 || userChoice > 3);
-						
+					userChoice = 0;
+					
+					menu.startMenu(); // show menu options for a start
+					response = (String)in.readObject();//receive response from server
+					System.out.println(response);// print out response so client knows what is being asked 
+					
+					//read in user choice. I'm using do/while loop to make sure only allowed options can go through
+					do{
+						userChoice = scan.nextInt();//read in user choice
 						scan.nextLine();//flush the scanner
 						
-						switch(userChoice){
-						case 1:
-							registerClient();
-							break;
-						case 2:							
-							loginClient();							
-							break;
-						case 3:
-							exitApplication();
-							
-							break;
-							
-						}
+					}while(userChoice < 0 || userChoice > 3);
+					
+					
+					System.out.println("Current user choice: "+userChoice);
+					switch(userChoice){
+					case 1:
+						registerClient(); // register new client
+						break;
+					case 2:							
+						loginClient(); // login existing client 							
+						break;
+					case 3:
+						exitApplication();	// exit application						
+						break;
 						
-						response = (String)in.readObject();						
+					}					
+										
 				}
 				catch(ClassNotFoundException classNot)
 				{
@@ -117,7 +119,7 @@ public class Client{
 				sendMessage(message);
 			}
 			
-			response = (String)in.readObject();
+			response = (String)in.readObject();//receive confirmation from server that client has been created.
 			
 			System.out.println(response);
 			

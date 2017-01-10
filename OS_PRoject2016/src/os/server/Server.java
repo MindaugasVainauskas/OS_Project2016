@@ -1,8 +1,6 @@
 package os.server;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -29,6 +27,14 @@ class ClientServiceThread extends Thread {
   private volatile boolean keepRunning = true;
   private ObjectOutputStream out;
   private ObjectInputStream in;
+  
+  //client file location for registration and logins.
+  final String clientFile = "./Client_Details/Clients.txt";
+  
+  //file writer and bufferedwriter for saving new client details;
+  FileWriter fw;
+  BufferedWriter bfw;
+  
 
   ClientServiceThread(Socket s, int i) {
     clientSocket = s;
@@ -113,31 +119,45 @@ class ClientServiceThread extends Thread {
 	  String cDetails;	  
 	  ClientDetails client = new ClientDetails();
 	 
+	  //File writer and buffered writer declaration.
+	 try {
+		fw = new FileWriter(clientFile, true);
+		bfw = new BufferedWriter(fw);
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	  
 	  try {
 		  //get client name
 		sendMessage("Please enter your full name:");
 		cDetails = (String)in.readObject();
 		client.setName(cDetails);//set name in client details
+		bfw.write("Name:"+client.getName()+";");
 		//get client address
 		sendMessage("Please enter your address:");
 		cDetails = (String)in.readObject();
 		client.setAddress(cDetails);//set address 
-		
+		bfw.write("Address:"+client.getAddress()+";");
 		//get client account number
 		sendMessage("Please enter your account number:");
 		cDetails = (String)in.readObject();
 		client.setAccNumber(cDetails);
-		
+		bfw.write("AccNumber:"+client.getAccNumber()+";");
 		//get client username
 		sendMessage("Please enter your username:");
 		cDetails = (String)in.readObject();
 		client.setUsername(cDetails);
-		
+		bfw.write("Username:"+client.getUsername()+";");
 		//get client password
 		sendMessage("Please enter your password");
 		cDetails = (String)in.readObject();
 		client.setPassword(cDetails);
+		bfw.write("Password:"+client.getPassword()+";\n");		
+		//close the filewriter and buffered writer
 		
+		bfw.close();
+		//send message to client showing newly created client's details
 		sendMessage("New Client: "+client.toString()+" Created");
 		
 	} catch (ClassNotFoundException | IOException e) {

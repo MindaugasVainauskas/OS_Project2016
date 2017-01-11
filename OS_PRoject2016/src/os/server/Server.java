@@ -3,6 +3,7 @@ package os.server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Server {
   public static void main(String[] args) throws Exception {
@@ -71,6 +72,9 @@ class ClientServiceThread extends Thread {
 					loginClient();
 					if(authenticated){
 						accessAccount();
+					}else if(!authenticated){
+						message = "Wrong credentials entered";
+						sendMessage(message);
 					}
 					break;
 				case "bye":
@@ -129,9 +133,19 @@ class ClientServiceThread extends Thread {
   private void registerClient(){
 	  String cDetails;	  
 	  ClientDetails client = new ClientDetails();
+	  boolean firstClient = false;
 	 
 	  //File writer and buffered writer declaration.
 	 try {
+		File cFile = new File(clientFile);
+		
+		//check if file exists
+		if(!cFile.exists()){
+			cFile.createNewFile();//create new file if doesnt exist
+			firstClient = true;//set boolean to true. this means next client entry will be first one in the file.
+		}
+		
+		
 		fw = new FileWriter(clientFile, true);
 		bfw = new BufferedWriter(fw);
 	} catch (IOException e1) {
@@ -144,30 +158,44 @@ class ClientServiceThread extends Thread {
 		sendMessage("Please enter your full name:");
 		cDetails = (String)in.readObject();
 		client.setName(cDetails);//set name in client details
-		bfw.write(client.getName());
+		
 		//get client address
 		sendMessage("Please enter your address:");
 		cDetails = (String)in.readObject();
 		client.setAddress(cDetails);//set address 
-		bfw.write(" "+client.getAddress());
+		
 		//get client account number
 		sendMessage("Please enter your account number:");
 		cDetails = (String)in.readObject();
 		client.setAccNumber(cDetails);
-		bfw.write(" "+client.getAccNumber());
+		
 		//get client username
 		sendMessage("Please enter your username:");
 		cDetails = (String)in.readObject();
 		client.setUsername(cDetails);
-		bfw.write(" "+client.getUsername());
+		
 		//get client password
 		sendMessage("Please enter your password");
 		cDetails = (String)in.readObject();
 		client.setPassword(cDetails);
-		bfw.write(" "+client.getPassword());		
-		//close the filewriter and buffered writer
+				
+		
 		client.setBalance(1000);//set initial balance for client to 1000.
-		bfw.write(" "+client.getBalance()+"\n");
+		
+		//save details into file. Username and password goes first for future login checks.
+		//following snippet of code checks if client entry is first in file or not. if not, it prepends new line character to front of it.
+		if(firstClient){
+			firstClient = false;
+		}else{
+			bfw.write("\n");
+		}
+		
+		bfw.write(client.getUsername());
+		bfw.write(","+client.getPassword());
+		bfw.write(","+client.getName());
+		bfw.write(","+client.getAddress());
+		bfw.write(","+client.getAccNumber());
+		bfw.write(","+client.getBalance()+",");		
 		bfw.close();//close buffered writer
 		//send message to client showing newly created client's details
 		sendMessage("New Client: "+client.toString()+" Created");
@@ -183,7 +211,7 @@ class ClientServiceThread extends Thread {
   private boolean loginClient(){
 	  String uNameCheck;
 	  String passCheck;
-	  
+	  File clientLogin = new File(clientFile);	
 	  
 	  try {
 		  message = "Please enter your username";
@@ -193,6 +221,31 @@ class ClientServiceThread extends Thread {
 		  message = "Please enter your password";
 		  sendMessage(message);
 		  passCheck = (String)in.readObject();
+		  
+		  //start up file reader and Scanner to read in user details
+		 	  
+		  Scanner fScanner = new Scanner(clientLogin);
+		  fScanner.useDelimiter(",");
+		  System.out.println(uNameCheck+" -:- "+passCheck);
+		  while(fScanner.hasNextLine()){
+			  
+		  	 String[] details = fScanner.nextLine().split("\\W+");
+		 
+			 String uName = details[0];//read in username
+			 String uPass = details[1];//read in password
+		 
+			 
+			  System.out.println(uName+" -:- "+uPass);
+			  
+			  if(uNameCheck.equalsIgnoreCase(uName) && passCheck.equalsIgnoreCase(uPass)){
+				  authenticated = true;
+				  break;//break out of file reader
+			  }			  
+			  
+		  }
+		  
+		  
+		  
 	} catch (ClassNotFoundException | IOException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -208,6 +261,7 @@ class ClientServiceThread extends Thread {
   private void disconnectClient(){
 	  message = "disconnect";
 	  sendMessage(message);
+	  authenticated = false;
   }
  
 }

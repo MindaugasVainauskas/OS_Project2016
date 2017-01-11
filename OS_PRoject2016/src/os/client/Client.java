@@ -139,12 +139,17 @@ public class Client{
 		
 		try {
 			response = (String)in.readObject();
+			System.out.println(response);
 			userName = scan.nextLine();
 			sendMessage(userName);
 			
 			response = (String)in.readObject();
+			System.out.println(response);
 			password = scan.nextLine();
 			sendMessage(password);
+			
+			response = (String)in.readObject();
+			System.out.println(response);
 			
 		} catch (ClassNotFoundException | IOException e) {
 			// TODO Auto-generated catch block

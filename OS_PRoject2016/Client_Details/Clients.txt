@@ -1,3 +1,2 @@
-Name:User 1;Address:Address 1;AccNumber:123;Username:user111;Password:Password01;
-Name:User 2;Address:Address 2;AccNumber:456;Username:user222;Password:Password02;
-Name:User 3;Address:Address 3;AccNumber:789;Username:user333;Password:Password03;
+User 1 Address 1 123 user111 Password01 1000
+User 2 Address 2 456 user222 Password02 1000

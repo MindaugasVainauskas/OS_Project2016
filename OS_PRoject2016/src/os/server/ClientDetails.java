@@ -7,6 +7,7 @@ public class ClientDetails {
 	private String accNumber;
 	private String username;
 	private String password;
+	private int balance;
 	
 	public ClientDetails(){
 		
@@ -53,10 +54,18 @@ public class ClientDetails {
 		this.password = password;
 	}
 
+	public int getBalance() {
+		return balance;
+	}
+
+	public void setBalance(int balance) {
+		this.balance = balance;
+	}
+
 	@Override
 	public String toString() {
 		return "ClientDetails [name=" + name + ", Address=" + Address + ", accNumber=" + accNumber + ", username="
-				+ username + ", password=" + password + "]";
+				+ username + ", password=" + password +", balance="+balance+"]";
 	}
 
 }

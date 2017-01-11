@@ -144,30 +144,31 @@ class ClientServiceThread extends Thread {
 		sendMessage("Please enter your full name:");
 		cDetails = (String)in.readObject();
 		client.setName(cDetails);//set name in client details
-		bfw.write("Name:"+client.getName()+";");
+		bfw.write(client.getName());
 		//get client address
 		sendMessage("Please enter your address:");
 		cDetails = (String)in.readObject();
 		client.setAddress(cDetails);//set address 
-		bfw.write("Address:"+client.getAddress()+";");
+		bfw.write(" "+client.getAddress());
 		//get client account number
 		sendMessage("Please enter your account number:");
 		cDetails = (String)in.readObject();
 		client.setAccNumber(cDetails);
-		bfw.write("AccNumber:"+client.getAccNumber()+";");
+		bfw.write(" "+client.getAccNumber());
 		//get client username
 		sendMessage("Please enter your username:");
 		cDetails = (String)in.readObject();
 		client.setUsername(cDetails);
-		bfw.write("Username:"+client.getUsername()+";");
+		bfw.write(" "+client.getUsername());
 		//get client password
 		sendMessage("Please enter your password");
 		cDetails = (String)in.readObject();
 		client.setPassword(cDetails);
-		bfw.write("Password:"+client.getPassword()+";\n");		
+		bfw.write(" "+client.getPassword());		
 		//close the filewriter and buffered writer
-		
-		bfw.close();
+		client.setBalance(1000);//set initial balance for client to 1000.
+		bfw.write(" "+client.getBalance()+"\n");
+		bfw.close();//close buffered writer
 		//send message to client showing newly created client's details
 		sendMessage("New Client: "+client.toString()+" Created");
 		

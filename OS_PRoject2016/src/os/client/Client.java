@@ -14,6 +14,7 @@ public class Client{
  	private String ipaddress;
  	private Scanner scan;
  	private MenuUI menu;
+ 	private volatile boolean loggedIn = false;
  	
 	Client(){
 		menu = new MenuUI();
@@ -133,6 +134,7 @@ public class Client{
 	private void loginClient(){
 		String userName;
 		String password;
+		int userSelection;
 		
 		message = "login";
 		sendMessage(message);//send user's chosen option to server
@@ -148,8 +150,40 @@ public class Client{
 			password = scan.nextLine();
 			sendMessage(password);
 			
+			
 			response = (String)in.readObject();
-			System.out.println(response);
+			if(response.equalsIgnoreCase("login_Successful")){
+				System.out.println("Login was successful");
+				loggedIn = true;				
+			}else{
+				System.out.println("Login was not successful!");
+			}
+			
+			while(loggedIn){
+				menu.selectionMenu();				
+				userSelection = scan.nextInt();
+				
+				switch(userSelection){
+				case 1:
+					System.out.println("Change details not implemented yet");
+					break;
+				case 2:
+					System.out.println("Make Lodgement not implemented yet");
+					break;
+				case 3:
+					System.out.println("Make Withdrawal not implemented yet");
+					break;
+				case 4:
+					System.out.println("View last 10 transactions not implemented yet");
+					break;
+				case 5:
+					System.out.println("Logging out of current account");
+					loggedIn = false;
+					break;
+				}
+			}
+			
+			
 			
 		} catch (ClassNotFoundException | IOException e) {
 			// TODO Auto-generated catch block

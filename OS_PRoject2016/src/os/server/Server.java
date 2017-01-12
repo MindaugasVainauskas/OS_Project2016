@@ -58,6 +58,7 @@ class ClientServiceThread extends Thread {
 		do{
 			try
 			{
+				authenticated = false;
 				message = "Make a choice please";				
 				sendMessage(message);
 				
@@ -72,7 +73,7 @@ class ClientServiceThread extends Thread {
 					loginClient();
 					if(authenticated){
 						accessAccount();
-					}else if(!authenticated){
+					}else{
 						message = "Wrong credentials entered";
 						sendMessage(message);
 					}
@@ -109,7 +110,7 @@ class ClientServiceThread extends Thread {
   }
   
   private void accessAccount() {
-	message = "Authentication successful";
+	message = "login_Successful";
 	sendMessage(message);
 	
 }

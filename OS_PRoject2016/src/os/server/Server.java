@@ -58,7 +58,7 @@ class ClientServiceThread extends Thread {
 		do{
 			try
 			{
-				authenticated = false;
+				authenticated = false;//refresh authentication variable
 				message = "Make a choice please";				
 				sendMessage(message);
 				
@@ -112,6 +112,14 @@ class ClientServiceThread extends Thread {
   private void accessAccount() {
 	message = "login_Successful";
 	sendMessage(message);
+	
+	try {
+		request = (String)in.readObject();
+		System.out.println(request);
+	} catch (ClassNotFoundException | IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 	
 }
 

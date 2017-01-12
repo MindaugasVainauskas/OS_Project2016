@@ -14,7 +14,11 @@ public class Client{
  	private String ipaddress;
  	private Scanner scan;
  	private MenuUI menu;
- 	private volatile boolean loggedIn = false;
+ 	
+ 	//user details that are checked at login.
+ 	private String userName;
+	private String password;
+ 	private volatile boolean loggedIn = false;//login boolean. If true then user is connected.
  	
 	Client(){
 		menu = new MenuUI();
@@ -132,8 +136,7 @@ public class Client{
 	
 	//login handling method
 	private void loginClient(){
-		String userName;
-		String password;
+		
 		int userSelection;
 		
 		message = "login";
@@ -164,21 +167,20 @@ public class Client{
 				userSelection = scan.nextInt();
 				
 				switch(userSelection){
-				case 1:
-					System.out.println("Change details not implemented yet");
+				case 1:					
+					changeDetails();//call method to change user details
 					break;
-				case 2:
-					System.out.println("Make Lodgement not implemented yet");
+				case 2:					
+					makeDeposit();// call method to make lodgement
 					break;
-				case 3:
-					System.out.println("Make Withdrawal not implemented yet");
+				case 3:					
+					makeWithdrawal(); //call method to make withdrawal
 					break;
-				case 4:
-					System.out.println("View last 10 transactions not implemented yet");
+				case 4:					
+					viewHistory();//call method to view last 10 transactions user made.
 					break;
 				case 5:
-					System.out.println("Logging out of current account");
-					loggedIn = false;
+					logOut();// call method to log out of current account					
 					break;
 				}
 			}
@@ -192,6 +194,44 @@ public class Client{
 		
 	}
 	
+	//log out of account
+	private void logOut() {
+		System.out.println("Logging out of current account");
+		loggedIn = false;
+		userName = "";
+		password = "";
+		
+	}
+
+	//check previous transaction history
+	private void viewHistory() {
+		System.out.println("View last 10 transactions not implemented yet");
+		
+	}
+
+	//make a deposit/Lodgement
+	private void makeDeposit() {
+		System.out.println("Make Lodgement not implemented yet");
+		
+	}
+
+	//make a withdrawal
+	private void makeWithdrawal() {
+		System.out.println("Make Withdrawal not implemented yet");
+		
+	}
+
+	//change user details
+	private void changeDetails() {
+		System.out.println("Change details not implemented yet");
+		System.out.println("Current username: "+userName);
+		System.out.println("Current password: "+password);
+		
+		message = userName+","+password;
+		sendMessage(message);
+		
+	}
+
 	//method to exit application
 	private void exitApplication(){
 		message = "bye";

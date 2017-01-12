@@ -101,8 +101,7 @@ public class Client{
 	{
 		try{
 			out.writeObject(msg);
-			out.flush();
-			System.out.println("client side entry>" + msg);
+			out.flush();			
 		}
 		catch(IOException ioException){
 			ioException.printStackTrace();
@@ -223,12 +222,73 @@ public class Client{
 
 	//change user details
 	private void changeDetails() {
-		System.out.println("Change details not implemented yet");
-		System.out.println("Current username: "+userName);
-		System.out.println("Current password: "+password);
+		System.out.println("Change details not fully implemented yet");
+		String newPassword="";
+		String newFName="";
+		String newAddress="";
 		
 		message = userName+","+password;
 		sendMessage(message);
+		
+		try {
+			response = (String)in.readObject();//read in response from server with current user details
+			String[] userDetails = response.split(",");
+			String curUName = userDetails[0];
+			String curPassword = userDetails[1];
+			String curUFName = userDetails[2];
+			String curAddress = userDetails[3];
+			String curAccountNo = userDetails[4];
+			String curBalance = userDetails[5];
+			
+			//display current user details
+			System.out.println("Current user Details:");
+			System.out.println("UserName: "+curUName);
+			System.out.println("Password: "+curPassword);
+			System.out.println("Full Name: "+curUFName);
+			System.out.println("Address: "+curAddress);
+			System.out.println("Account Number: "+curAccountNo);
+			
+			System.out.println("Username and account number can not be changed!\n");
+			
+			menu.detailChange();//display menu for detail change
+			int detailChoice = scan.nextInt();
+			scan.nextLine();
+			switch(detailChoice){
+			case 1:
+				System.out.println("Enter new Password please.");			
+				newPassword = scan.nextLine();
+				newFName = curUFName;
+				newAddress = curAddress;
+				break;
+			case 2:
+				System.out.println("Enter new name please.");
+				newFName = scan.nextLine();
+				newAddress = curAddress;
+				newPassword = curPassword;
+				break;
+			case 3:
+				System.out.println("Enter new address please.");
+				newAddress = scan.nextLine();
+				newPassword = curPassword;
+				newFName = curUFName;
+				break;
+			case 4:
+				System.out.println("Enter new Password please.");			
+				newPassword = scan.nextLine();
+				System.out.println("Enter new name please.");
+				newFName = scan.nextLine();
+				System.out.println("Enter new address please.");
+				newAddress = scan.nextLine();
+				break;
+			}
+			
+			
+			message = curUName+","+newPassword+","+newFName+","+newAddress+","+curAccountNo+","+curBalance+",";
+			System.out.println("New Details to send to server: "+message);
+		} catch (ClassNotFoundException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 

@@ -19,5 +19,13 @@ public class MenuUI {
 		System.out.println("4 - View last 10 transactions made on this account;");
 		System.out.println("5 - Log out of this account;");
 	}
+	
+	public void detailChange(){
+		System.out.println("Select one of following options to change details:");
+		System.out.println("1 - Change password;");
+		System.out.println("2 - Change name;");
+		System.out.println("3 - Change address;");
+		System.out.println("4 - Change password, name, and address;");
+	}
 
 }

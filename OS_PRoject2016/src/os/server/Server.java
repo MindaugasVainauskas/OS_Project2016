@@ -15,7 +15,7 @@ public class Server {
       id++;
       ClientServiceThread cliThread = new ClientServiceThread(clientSocket, id);
       cliThread.start();
-    }
+    }    
   }
 }
 
@@ -24,8 +24,7 @@ class ClientServiceThread extends Thread {
   private Socket clientSocket;
   private String message;
   private String request;
-  private int clientID;
-  private volatile boolean keepRunning = true;
+  private int clientID;  
   private boolean authenticated = false;
   private ObjectOutputStream out;
   private ObjectInputStream in;
@@ -34,8 +33,10 @@ class ClientServiceThread extends Thread {
   final String clientFile = "./Client_Details/Clients.txt";
   
   //file writer and bufferedwriter for saving new client details;
-  FileWriter fw;
-  BufferedWriter bfw;
+  private FileWriter fw;
+  private BufferedWriter bfw;
+  
+  private Scanner fScanner;
   
 
   ClientServiceThread(Socket s, int i) {
@@ -102,6 +103,8 @@ class ClientServiceThread extends Thread {
 			in.close();
 			out.close();
 			clientSocket.close();
+			fScanner.close();
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -112,10 +115,33 @@ class ClientServiceThread extends Thread {
   private void accessAccount() {
 	message = "login_Successful";
 	sendMessage(message);
+	File clientDetails = new File(clientFile);
 	
 	try {
 		request = (String)in.readObject();
 		System.out.println(request);
+		
+		fScanner = new Scanner(clientDetails);
+		  fScanner.useDelimiter(",");//use delimiter of "," when reading file
+		  
+		  String[] namePassword = request.split("\\W+");
+		  String curUserName = namePassword[0];
+		  String curPassword = namePassword[1];
+		 
+		  while(fScanner.hasNextLine()){
+			 String currentUser = fScanner.nextLine();
+		  	 String[] details = currentUser.split("\\W+");
+		 
+			 String uName = details[0];//read in username
+			 String uPass = details[1];//read in password
+			 
+			 if(uName.equalsIgnoreCase(curUserName) && uPass.equalsIgnoreCase(curPassword)){
+				//send current user details to client
+				 sendMessage(currentUser);
+				 break;
+			 }
+			 
+		  }
 	} catch (ClassNotFoundException | IOException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -233,8 +259,8 @@ class ClientServiceThread extends Thread {
 		  
 		  //start up file reader and Scanner to read in user details
 		 	  
-		  Scanner fScanner = new Scanner(clientLogin);
-		  fScanner.useDelimiter(",");
+		  fScanner = new Scanner(clientLogin);
+		  fScanner.useDelimiter(",");//use delimiter of "," when reading file
 		  System.out.println(uNameCheck+" -:- "+passCheck);
 		  while(fScanner.hasNextLine()){
 			  

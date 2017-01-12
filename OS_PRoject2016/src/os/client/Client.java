@@ -3,16 +3,23 @@ package os.client;
 
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
 import java.util.Scanner;
 public class Client{
-	private Socket requestSocket;
+	private Socket requestSocket;// client socket
+	//data streams for send ing and receiving messages
 	private ObjectOutputStream out;
  	private ObjectInputStream in;
- 	private String message="";
- 	private int userChoice;
+ 	//string variables to send messages to server and receive responses from it.
  	private String response;
+ 	private String message="";
+ 	//used for menu selection
+ 	private int userChoice;
+ 	//ip address of server
  	private String ipaddress;
+ 	//scanner for reading in keyboard input
  	private Scanner scan;
+ 	//class that contains methods for showing different menu options at different times.
  	private MenuUI menu;
  	
  	//user details that are checked at login.
@@ -20,6 +27,17 @@ public class Client{
 	private String password;
  	private volatile boolean loggedIn = false;//login boolean. If true then user is connected.
  	
+ 	
+ 	//details variables used for when user successfully logs in
+ 	String[] userDetails;
+ 	private String curUName;
+ 	private String curPassword;
+ 	private String curUFName;
+ 	private String curAddress;
+ 	private String curAccountNo;
+ 	private String curBalance;
+ 	
+ 	//constructor
 	Client(){
 		menu = new MenuUI();
 	}
@@ -156,14 +174,37 @@ public class Client{
 			response = (String)in.readObject();
 			if(response.equalsIgnoreCase("login_Successful")){
 				System.out.println("Login was successful");
-				loggedIn = true;				
+				loggedIn = true;	
+				//send username and password to server to receive corresponding user details string
+				message = userName+","+password;
+				sendMessage(message);
+				
+				response = (String)in.readObject();//read in response from server with current user details
+				String user = response.substring(0, response.length()-1);
+				userDetails = user.split(",");//split response string into details
+				curUName = userDetails[0];
+				curPassword = userDetails[1];
+				curUFName = userDetails[2];
+				curAddress = userDetails[3];
+				curAccountNo = userDetails[4];
+				curBalance = userDetails[5];
 			}else{
 				System.out.println("Login was not successful!");
 			}
 			
-			while(loggedIn){
+			while(loggedIn){				
+				//display current user details
+				System.out.println("Current user Details:");
+				System.out.println("UserName: "+curUName);
+				System.out.println("Password: "+curPassword);
+				System.out.println("Full Name: "+curUFName);
+				System.out.println("Address: "+curAddress);
+				System.out.println("Account Number: "+curAccountNo);
+				System.out.println("Current account balance: "+curBalance);
+				
+				//show selection menu
 				menu.selectionMenu();				
-				userSelection = scan.nextInt();
+				userSelection = scan.nextInt();//get user to choose what they want to do
 				
 				switch(userSelection){
 				case 1:					
@@ -222,73 +263,49 @@ public class Client{
 
 	//change user details
 	private void changeDetails() {
-		System.out.println("Change details not fully implemented yet");
+		
+		//local variables to handle change of password, name or address
 		String newPassword="";
 		String newFName="";
-		String newAddress="";
+		String newAddress="";		
 		
-		message = userName+","+password;
-		sendMessage(message);
+		System.out.println("Username and account number can not be changed!\n");
 		
-		try {
-			response = (String)in.readObject();//read in response from server with current user details
-			String[] userDetails = response.split(",");
-			String curUName = userDetails[0];
-			String curPassword = userDetails[1];
-			String curUFName = userDetails[2];
-			String curAddress = userDetails[3];
-			String curAccountNo = userDetails[4];
-			String curBalance = userDetails[5];
-			
-			//display current user details
-			System.out.println("Current user Details:");
-			System.out.println("UserName: "+curUName);
-			System.out.println("Password: "+curPassword);
-			System.out.println("Full Name: "+curUFName);
-			System.out.println("Address: "+curAddress);
-			System.out.println("Account Number: "+curAccountNo);
-			
-			System.out.println("Username and account number can not be changed!\n");
-			
-			menu.detailChange();//display menu for detail change
-			int detailChoice = scan.nextInt();
-			scan.nextLine();
-			switch(detailChoice){
-			case 1:
-				System.out.println("Enter new Password please.");			
-				newPassword = scan.nextLine();
-				newFName = curUFName;
-				newAddress = curAddress;
-				break;
-			case 2:
-				System.out.println("Enter new name please.");
-				newFName = scan.nextLine();
-				newAddress = curAddress;
-				newPassword = curPassword;
-				break;
-			case 3:
-				System.out.println("Enter new address please.");
-				newAddress = scan.nextLine();
-				newPassword = curPassword;
-				newFName = curUFName;
-				break;
-			case 4:
-				System.out.println("Enter new Password please.");			
-				newPassword = scan.nextLine();
-				System.out.println("Enter new name please.");
-				newFName = scan.nextLine();
-				System.out.println("Enter new address please.");
-				newAddress = scan.nextLine();
-				break;
-			}
-			
-			
-			message = curUName+","+newPassword+","+newFName+","+newAddress+","+curAccountNo+","+curBalance+",";
-			System.out.println("New Details to send to server: "+message);
-		} catch (ClassNotFoundException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		menu.detailChange();//display menu for detail change
+		int detailChoice = scan.nextInt();
+		scan.nextLine();
+		switch(detailChoice){
+		case 1:
+			System.out.println("Enter new Password please.");			
+			newPassword = scan.nextLine();
+			newFName = curUFName;
+			newAddress = curAddress;
+			break;
+		case 2:
+			System.out.println("Enter new name please.");
+			newFName = scan.nextLine();
+			newAddress = curAddress;
+			newPassword = curPassword;
+			break;
+		case 3:
+			System.out.println("Enter new address please.");
+			newAddress = scan.nextLine();
+			newPassword = curPassword;
+			newFName = curUFName;
+			break;
+		case 4:
+			System.out.println("Enter new Password please.");			
+			newPassword = scan.nextLine();
+			System.out.println("Enter new name please.");
+			newFName = scan.nextLine();
+			System.out.println("Enter new address please.");
+			newAddress = scan.nextLine();
+			break;
 		}
+		
+		
+		String updatedDetails = curUName+","+newPassword+","+newFName+","+newAddress+","+curAccountNo+","+curBalance+",";
+		System.out.println("New Details to send to server: "+updatedDetails);
 		
 	}
 

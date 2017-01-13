@@ -142,7 +142,59 @@ class ClientServiceThread extends Thread {
 			 }
 			 
 		  }
+		  //received updated client details from client
+		  request = (String)in.readObject();
+		  System.out.println(request);
+		  
+		  //if client made updates to client data it invokes updateDetails method. Otherwise just a message is displayed.
+		  if(!request.equalsIgnoreCase("NoUpdates")){
+			  updateDetails(request);
+		  }else{
+			  System.out.println("No updates in this session");
+		  }
+		  
 	} catch (ClassNotFoundException | IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+}
+
+//method to update user details. It is not finished! currently only reads data from file and finds line in file that corresponds to line that should be replacing it.
+private void updateDetails(String detailChange) {
+	
+	try {
+		BufferedReader bfr = new BufferedReader(new FileReader(clientFile));
+		
+		
+		  String[] uName_Account = detailChange.split(",");
+		  String curUserName = uName_Account[0];
+		  String curAccountNo = uName_Account[4];
+		  System.out.println(curUserName+"-:-"+curAccountNo);
+		  
+		  String currentUser;
+		 
+		  while((currentUser = bfr.readLine()) != null){
+			  
+		  	 String[] details = currentUser.split(",");
+		 
+			 String uName = details[0];//read in username
+			 String uAccount = details[4];//read in password
+			 System.out.println("Current line: "+uName+"-:-"+uAccount);
+			 if(uName.equalsIgnoreCase(curUserName) && uAccount.equalsIgnoreCase(curAccountNo)){
+				//show that application finds existing line in file.
+				System.out.println("Current line on file: "+currentUser);
+				System.out.println("Replacement line: "+detailChange);	
+					 
+			 }		 
+		  	
+			
+		  }
+		  
+		  //close reader and writer once they are done
+		  bfr.close();
+		
+	} catch (IOException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
@@ -261,16 +313,13 @@ class ClientServiceThread extends Thread {
 		 	  
 		  fScanner = new Scanner(clientLogin);
 		  fScanner.useDelimiter(",");//use delimiter of "," when reading file
-		  System.out.println(uNameCheck+" -:- "+passCheck);
+		  
 		  while(fScanner.hasNextLine()){
 			  
 		  	 String[] details = fScanner.nextLine().split("\\W+");
 		 
 			 String uName = details[0];//read in username
-			 String uPass = details[1];//read in password
-		 
-			 
-			  System.out.println(uName+" -:- "+uPass);
+			 String uPass = details[1];//read in password			
 			  
 			  if(uNameCheck.equalsIgnoreCase(uName) && passCheck.equalsIgnoreCase(uPass)){
 				  authenticated = true;

@@ -29,13 +29,15 @@ public class Client{
  	
  	
  	//details variables used for when user successfully logs in
- 	String[] userDetails;
+ 	private String[] userDetails;
  	private String curUName;
  	private String curPassword;
  	private String curUFName;
  	private String curAddress;
  	private String curAccountNo;
  	private String curBalance;
+ 	private boolean updated;
+ 	private String updatedDetails;//string to store updated client details to send to server
  	
  	//constructor
 	Client(){
@@ -193,12 +195,8 @@ public class Client{
 			}
 			
 			while(loggedIn){				
-				//display current user details
-				System.out.println("Current user Details:");
-				System.out.println("UserName: "+curUName);
-				System.out.println("Password: "+curPassword);
-				System.out.println("Full Name: "+curUFName);
-				System.out.println("Address: "+curAddress);
+				//display current user account details
+				System.out.println("Current user account Details:");				
 				System.out.println("Account Number: "+curAccountNo);
 				System.out.println("Current account balance: "+curBalance);
 				
@@ -240,6 +238,13 @@ public class Client{
 		loggedIn = false;
 		userName = "";
 		password = "";
+		
+		if(updated){
+			sendMessage(updatedDetails);
+			updated = false;
+		}else{
+			sendMessage("NoUpdates");
+		}
 		
 	}
 
@@ -304,8 +309,9 @@ public class Client{
 		}
 		
 		
-		String updatedDetails = curUName+","+newPassword+","+newFName+","+newAddress+","+curAccountNo+","+curBalance+",";
+		updatedDetails = curUName+","+newPassword+","+newFName+","+newAddress+","+curAccountNo+","+curBalance+",";
 		System.out.println("New Details to send to server: "+updatedDetails);
+		updated = true;
 		
 	}
 
